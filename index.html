@@ -1,0 +1,52 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Scopone</title>
+<style>
+body{font-family:system-ui;margin:0;padding:10px;background:#0b6b3a;color:#fff}
+.r{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;min-height:60px}
+.c{background:#fff;color:#000;border-radius:6px;padding:10px 8px;min-width:46px;font-weight:700;border:3px solid #fff;font-size:18px}
+.c.red{color:#c00}.c.s{border-color:#fc0}.c.t{border-color:#09f}
+button.g{padding:12px 18px;font-size:16px;border-radius:8px;border:0;background:#fc0;margin-top:6px}
+small{opacity:.85}
+</style>
+<div id=app>Connessione…</div>
+<script>
+const S=['♦','♥','♠','♣'],V='A234567FCR';
+const val=c=>c%10+1,card=c=>V[c%10]+S[c/10|0];
+const name=prompt('Il tuo nome?')||'Giocatore',room=location.hash.slice(1)||'tavolo';
+const ws=new WebSocket((location.protocol=='https:'?'wss://':'ws://')+location.host);
+const send=o=>ws.send(JSON.stringify(o));
+ws.onopen=()=>send({t:'join',room,name});
+ws.onclose=()=>app.textContent='Disconnesso: ricarica la pagina';
+let st,sel=null,take=[];
+ws.onmessage=e=>{st=JSON.parse(e.data);sel=null;take=[];draw()};
+const btn=(c,cls,fn)=>`<button class="c ${cls} ${(c/10|0)<2?'red':''}" onclick="${fn}(${c})">${card(c)}</button>`;
+function pick(c){
+  sel=c;take=[];
+  const same=st.table.filter(x=>val(x)==val(c));
+  if(same.length==1)take=[same[0]];
+  draw();
+}
+function tk(c){
+  if(sel===null)return;
+  take=take.includes(c)?take.filter(x=>x!=c):[...take,c];
+  draw();
+}
+function go(){send({t:'play',id:sel,take})}
+function draw(){
+  const s=st;
+  if(s.msg){app.textContent=s.msg;return}
+  const me=s.you,tm=me%2;
+  let h=`<div>Noi <b>${s.total[tm]}</b> – Loro <b>${s.total[1-tm]}</b> &nbsp;<small>scope mano: ${s.scope[tm]}–${s.scope[1-tm]}</small></div>`;
+  h+='<div><small>'+s.names.map((n,i)=>`${i==s.turn?'👉 ':''}${n||'(libero)'}${i==me?' (tu)':i==(me+2)%4?' (compagno)':''}: ${s.counts[i]}`).join(' · ')+'</small></div>';
+  if(!s.full)h+='<p>In attesa che si colleghino tutti e 4 i giocatori…</p>';
+  h+=`<div><small>${s.log}</small></div><div class=r>`;
+  h+=s.table.length?s.table.map(c=>btn(c,take.includes(c)?'t':'','tk')).join(''):'<small>Tavolo vuoto</small>';
+  h+='</div><div class=r>'+s.hand.map(c=>btn(c,sel===c?'s':'','pick')).join('')+'</div>';
+  if(s.over){
+    h+=`<p><b>Mano finita</b><br>Noi: ${s.res[tm]}<br>Loro: ${s.res[1-tm]}</p><button class=g onclick="send({t:'next'})">Prossima mano</button>`;
+  }else if(s.turn==me&&s.full){
+    h+=`<div><small>Tocca a te: scegli una carta, poi le carte da prendere (se ce ne sono).</small></div><button class=g onclick="go()" ${sel===null?'disabled':''}>Gioca</button>`;
+  }
+  app.innerHTML=h;
+}
+</script>
