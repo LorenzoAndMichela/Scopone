@@ -4,7 +4,7 @@
 body{font-family:system-ui;margin:0;padding:10px;background:#0b6b3a;color:#fff}
 .r{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;min-height:60px}
 .c{padding:0;background:none;border:3px solid transparent;border-radius:9px}
-.c svg{width:56px;height:auto;display:block}
+.c svg,.c img{width:56px;height:auto;display:block;border-radius:6px}
 .c.s{border-color:#fc0}.c.t{border-color:#09f}
 button.g{padding:12px 18px;font-size:16px;border-radius:8px;border:0;background:#fc0;margin-top:6px}
 small{opacity:.85}
@@ -35,7 +35,7 @@ function svg(c){
   else b=sym(s,32,24,.9)+`<text x="32" y="56" text-anchor="middle" font-size="26" font-weight="700" fill="${tc}">${'FCR'[v-8]}</text><text x="32" y="68" text-anchor="middle" font-size="8" fill="${tc}">${['FANTE','CAVALLO','RE'][v-8]}</text>`+sym(s,32,84,.9);
   return `<svg viewBox="0 0 64 104"><rect x="1" y="1" width="62" height="102" rx="7" fill="#fbf6e6" stroke="#444"/><rect x="5" y="5" width="54" height="94" rx="4" fill="none" stroke="${tc}" stroke-opacity=".35"/>${b}<text x="9" y="17" font-size="12" font-weight="700" fill="${tc}">${v}</text><text transform="translate(55 91) rotate(180)" font-size="12" font-weight="700" fill="${tc}">${v}</text></svg>`;
 }
-const btn=(c,cls,fn)=>`<button class="c ${cls}" onclick="${fn}(${c})">${svg(c)}</button>`;
+const btn=(c,cls,fn)=>`<button class="c ${cls}" onclick="${fn}(${c})"><img src="c${c}.png" onerror="this.outerHTML=svg(${c})"></button>`;
 function pick(c){
   sel=c;take=[];
   const same=st.table.filter(x=>val(x)==val(c));

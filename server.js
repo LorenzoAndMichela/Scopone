@@ -1,5 +1,10 @@
 const http=require('http'),fs=require('fs'),{WebSocketServer}=require('ws');
-const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html;charset=utf-8'});r.end(fs.readFileSync(__dirname+'/index.html'))});
+const path=require('path'),mime={'.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml'};
+const srv=http.createServer((q,r)=>{
+  const f=path.basename(q.url.split('?')[0]);
+  if(mime[path.extname(f)]&&fs.existsSync(path.join(__dirname,f))){r.writeHead(200,{'content-type':mime[path.extname(f)]});return r.end(fs.readFileSync(path.join(__dirname,f)))}
+  r.writeHead(200,{'content-type':'text/html;charset=utf-8'});r.end(fs.readFileSync(__dirname+'/index.html'));
+});
 const wss=new WebSocketServer({server:srv}),rooms={};
 const val=c=>c%10+1,su=c=>c/10|0,cs=c=>'A234567FCR'[c%10]+'♦♥♠♣'[su(c)];
 const P={7:21,6:18,1:16,5:15,4:14,3:13,2:12,8:10,9:10,10:10};
