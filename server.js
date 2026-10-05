@@ -10,7 +10,8 @@ const val=c=>c%10+1,su=c=>c/10|0,cs=c=>'A234567FCR'[c%10]+'♦♥♠♣'[su(c)];
 const P={7:21,6:18,1:16,5:15,4:14,3:13,2:12,8:10,9:10,10:10};
 
 function deal(r){
-  const d=[...Array(40).keys()].sort(()=>Math.random()-.5);
+  const d=[...Array(40).keys()];
+  for(let i=39;i>0;i--){const j=require('crypto').randomInt(i+1);[d[i],d[j]]=[d[j],d[i]]}
   r.hands=[0,1,2,3].map(i=>d.slice(i*10,i*10+10));
   r.table=[];r.won=[[],[]];r.scope=[0,0];r.over=false;r.res=null;
   r.first=((r.first??-1)+1)%4;r.turn=r.first;r.lastTeam=0;r.log='Nuova mano';
