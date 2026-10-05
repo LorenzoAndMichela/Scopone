@@ -69,6 +69,7 @@ wss.on('connection',ws=>{
       if(!r){r=rooms[o.room]={seats:[null,null,null,null],names:[null,null,null,null],total:[0,0]};deal(r)}
       s=r.names.findIndex((n,i)=>n==o.name&&!r.seats[i]);
       if(s<0)s=r.names.findIndex(n=>n==null);
+      if(s<0)s=r.seats.findIndex(w=>!w);
       if(s<0){ws.send(JSON.stringify({msg:'Tavolo pieno'}));r=null;return}
       r.seats[s]=ws;r.names[s]=o.name;
     }else if(r&&o.t=='play')play(r,s,o.id,o.take||[]);

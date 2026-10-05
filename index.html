@@ -50,9 +50,9 @@ function tk(c){
 function go(){send({t:'play',id:sel,take})}
 function draw(){
   const s=st;
-  if(s.msg){app.textContent=s.msg;return}
+  if(s.msg){app.textContent=s.msg+' (tavolo: '+room+')';return}
   const me=s.you,tm=me%2;
-  let h=`<div>Noi <b>${s.total[tm]}</b> – Loro <b>${s.total[1-tm]}</b> &nbsp;<small>scope mano: ${s.scope[tm]}–${s.scope[1-tm]}</small></div>`;
+  let h=`<div><small>Tavolo: ${room}</small></div><div>Noi <b>${s.total[tm]}</b> – Loro <b>${s.total[1-tm]}</b> &nbsp;<small>scope mano: ${s.scope[tm]}–${s.scope[1-tm]}</small></div>`;
   h+='<div><small>'+s.names.map((n,i)=>`${i==s.turn?'👉 ':''}${n||'(libero)'}${i==me?' (tu)':i==(me+2)%4?' (compagno)':''}: ${s.counts[i]}`).join(' · ')+'</small></div>';
   if(!s.full)h+='<p>In attesa che si colleghino tutti e 4 i giocatori…</p>';
   h+=`<div><small>${s.log}</small></div><div class=r>`;
